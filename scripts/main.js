@@ -46,20 +46,43 @@ function insertNameFromFirestore() {
 // Then it will change the bookmark icon from the hollow to the solid version. 
 //-----------------------------------------------------------------------------
 function saveBookmark(hikeDocID) {
-    // Manage the backend process to store the hikeDocID in the database, recording which hike was bookmarked by the user.
-    currentUser.update({
-        // Use 'arrayUnion' to add the new bookmark ID to the 'bookmarks' array.
-        // This method ensures that the ID is added only if it's not already present, preventing duplicates.
-        bookmarks: firebase.firestore.FieldValue.arrayUnion(hikeDocID)
+    currentUser.get().then(userDoc => {
+        const bookmarks = userDoc.data().bookmarks
+        if (bookmarks.includes(hikeDocID)) {
+            currentUser.update({
+                // Use 'arrayUnion' to add the new bookmark ID to the 'bookmarks' array.
+                // This method ensures that the ID is added only if it's not already present, preventing duplicates.
+                bookmarks: firebase.firestore.FieldValue.arrayRemove(hikeDocID)
+            })
+                // Handle the front-end update to change the icon, providing visual feedback to the user that it has been clicked.
+                .then(function () {
+                    console.log("bookmark has been removed for" + hikeDocID);
+                    let iconID = 'save-' + hikeDocID;
+                    //console.log(iconID);
+                    //this is to change the icon of the hike that was saved to "filled"
+                    document.getElementById(iconID).innerText = 'bookmark_border';
+                });
+        }
+        else {
+            currentUser.update({
+                // Use 'arrayUnion' to add the new bookmark ID to the 'bookmarks' array.
+                // This method ensures that the ID is added only if it's not already present, preventing duplicates.
+                bookmarks: firebase.firestore.FieldValue.arrayUnion(hikeDocID)
+            })
+                // Handle the front-end update to change the icon, providing visual feedback to the user that it has been clicked.
+                .then(function () {
+                    console.log("bookmark has been saved for" + hikeDocID);
+                    let iconID = 'save-' + hikeDocID;
+                    //console.log(iconID);
+                    //this is to change the icon of the hike that was saved to "filled"
+                    document.getElementById(iconID).innerText = 'bookmark';
+                });
+        }
+
+
     })
-        // Handle the front-end update to change the icon, providing visual feedback to the user that it has been clicked.
-        .then(function () {
-            console.log("bookmark has been saved for" + hikeDocID);
-            let iconID = 'save-' + hikeDocID;
-            //console.log(iconID);
-            //this is to change the icon of the hike that was saved to "filled"
-            document.getElementById(iconID).innerText = 'bookmark';
-        });
+    // Manage the backend process to store the hikeDocID in the database, recording which hike was bookmarked by the user.
+
 }
 
 // Function to read the quote of the day from the Firestore "quotes" collection
