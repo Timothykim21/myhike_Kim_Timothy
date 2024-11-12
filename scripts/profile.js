@@ -4,12 +4,9 @@ function populateUserInfo() {
         // Check if user is signed in:
         if (user) {
 
-            console.log(user.uid); //print the uid in the browser console
-            console.log(user.displayName)
 
             //go to the correct user document by referencing to the user uid
             currentUser = db.collection("users").doc(user.uid)
-            console.log(currentUser)
             //get the document for current user.
             currentUser.get()
                 .then(userDoc => {
