@@ -149,6 +149,7 @@ function displayCardsDynamically(collection) {
                     var bookmarks = userDoc.data().bookmarks;
                     if (bookmarks.includes(docID)) {
                         document.getElementById('save-' + docID).innerText = 'bookmark';
+                        console.log(userDoc)
                     }
                 })
 
